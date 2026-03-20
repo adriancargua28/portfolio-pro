@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'portfolio/css/style.css' %}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ───────────── NAVBAR ───────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">
+        <span class="logo-bracket">&lt;</span>SC<span class="logo-bracket">/&gt;</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#hero">Inicio</a></li>
+        <li><a href="#projects">Proyectos</a></li>
+        <li><a href="#skills">Habilidades</a></li>
+        <li><a href="#timeline">Experiencia</a></li>
+        <li><a href="#contact">Contacto</a></li>
+      </ul>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ───────────── HERO ───────────── -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="hero-grid"></div>
+      <div class="hero-glow glow-1"></div>
+      <div class="hero-glow glow-2"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Disponible para proyectos
+      </div>
+      <h1 class="hero-title">
+        Hola, soy<br />
+        <span class="hero-name">{{ owner }}</span>
+      </h1>
+      <p class="hero-subtitle">
+        <span class="typed-wrapper">
+          <span class="typed-text" id="typed"></span><span class="cursor">|</span>
+        </span>
+      </p>
+      <p class="hero-desc">
+        Construyo experiencias digitales de alto impacto. Especializado en arquitecturas
+        backend robustas con Python &amp; Django y frontends reactivos que enamoran al usuario.
+      </p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">Ver Proyectos</a>
+        <a href="#contact" class="btn btn-outline">Contáctame</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">4+</span>
+          <span class="stat-label">Años de experiencia</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">30+</span>
+          <span class="stat-label">Proyectos entregados</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">15+</span>
+          <span class="stat-label">Clientes satisfechos</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="code-card">
+        <div class="code-header">
+          <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+          <span class="code-filename">portfolio.py</span>
+        </div>
+        <pre class="code-body"><code><span class="kw">class</span> <span class="cls">Developer</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(self):
+        self.name = <span class="str">"Sergio Cargua"</span>
+        self.role = <span class="str">"Full Stack Dev"</span>
+        self.stack = [
+            <span class="str">"Python"</span>, <span class="str">"Django"</span>,
+            <span class="str">"React"</span>, <span class="str">"PostgreSQL"</span>,
+            <span class="str">"Docker"</span>, <span class="str">"AWS"</span>,
+        ]
+        self.passion = <span class="str">"∞"</span>
+
+    <span class="kw">def</span> <span class="fn">code</span>(self):
+        <span class="kw">return</span> <span class="str">"¡Siempre!"</span> <span class="com"># 🚀</span></code></pre>
+      </div>
+    </div>
+    <a href="#projects" class="scroll-indicator" aria-label="Scroll down">
+      <span class="scroll-arrow"></span>
+    </a>
+  </section>
+
+  <!-- ───────────── PROJECTS ───────────── -->
+  <section class="section" id="projects">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">// proyectos</span>
+        <h2 class="section-title">Trabajos Destacados</h2>
+        <p class="section-subtitle">Una selección de proyectos que demuestran mi capacidad para resolver retos técnicos reales.</p>
+      </div>
+      <div class="projects-grid">
+        {% for project in projects %}
+        <article class="project-card" style="--accent:{{ project.color }}">
+          <div class="project-icon">{{ project.icon }}</div>
+          <h3 class="project-name">{{ project.name }}</h3>
+          <p class="project-desc">{{ project.description }}</p>
+          <div class="project-tags">
+            {% for tag in project.tags %}
+            <span class="tag">{{ tag }}</span>
+            {% endfor %}
+          </div>
+          <div class="project-footer">
+            <a href="#" class="project-link">Ver más →</a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── SKILLS ───────────── -->
+  <section class="section section-alt" id="skills">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">// habilidades</span>
+        <h2 class="section-title">Stack Tecnológico</h2>
+        <p class="section-subtitle">Tecnologías que domino y aplico diariamente para construir soluciones de calidad.</p>
+      </div>
+      <div class="skills-grid">
+        {% for skill in skills %}
+        <div class="skill-item">
+          <div class="skill-header">
+            <span class="skill-icon">{{ skill.icon }}</span>
+            <span class="skill-name">{{ skill.name }}</span>
+            <span class="skill-pct">{{ skill.level }}%</span>
+          </div>
+          <div class="skill-bar-bg">
+            <div class="skill-bar-fill" data-width="{{ skill.level }}"></div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="tools-section">
+        <h3 class="tools-title">También trabajo con</h3>
+        <div class="tools-cloud">
+          <span class="tool-chip">AWS</span>
+          <span class="tool-chip">Heroku</span>
+          <span class="tool-chip">Nginx</span>
+          <span class="tool-chip">Linux</span>
+          <span class="tool-chip">Celery</span>
+          <span class="tool-chip">Redis</span>
+          <span class="tool-chip">GraphQL</span>
+          <span class="tool-chip">Swagger</span>
+          <span class="tool-chip">GitHub Actions</span>
+          <span class="tool-chip">Figma</span>
+          <span class="tool-chip">Postman</span>
+          <span class="tool-chip">VS Code</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── TIMELINE ───────────── -->
+  <section class="section" id="timeline">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">// trayectoria</span>
+        <h2 class="section-title">Experiencia &amp; Educación</h2>
+        <p class="section-subtitle">Mi camino profesional y académico que me ha forjado como desarrollador.</p>
+      </div>
+      <div class="timeline">
+        {% for item in timeline %}
+        <div class="timeline-item {% if forloop.counter|divisibleby:2 %}timeline-right{% else %}timeline-left{% endif %}">
+          <div class="timeline-card">
+            <div class="timeline-type-badge {% if item.type == 'edu' %}badge-edu{% else %}badge-work{% endif %}">
+              {% if item.type == 'edu' %}🎓 Educación{% else %}💼 Trabajo{% endif %}
+            </div>
+            <span class="timeline-year">{{ item.year }}</span>
+            <h3 class="timeline-title">{{ item.title }}</h3>
+            <span class="timeline-company">{{ item.company }}</span>
+            <p class="timeline-desc">{{ item.description }}</p>
+          </div>
+        </div>
+        {% endfor %}
+        <div class="timeline-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── CONTACT ───────────── -->
+  <section class="section section-alt" id="contact">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">// contacto</span>
+        <h2 class="section-title">Hablemos</h2>
+        <p class="section-subtitle">¿Tienes un proyecto en mente? Me encantaría escucharte y convertir tu idea en realidad.</p>
+      </div>
+      <div class="contact-wrapper">
+        <div class="contact-info">
+          <div class="contact-item">
+            <span class="contact-icon">📧</span>
+            <div>
+              <span class="contact-label">Email</span>
+              <a href="mailto:sergio@example.com" class="contact-value">sergio@example.com</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">💼</span>
+            <div>
+              <span class="contact-label">LinkedIn</span>
+              <a href="#" class="contact-value">linkedin.com/in/sergio-cargua</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">🐙</span>
+            <div>
+              <span class="contact-label">GitHub</span>
+              <a href="#" class="contact-value">github.com/adriancargua28</a>
+            </div>
+          </div>
+          <div class="contact-item">
+            <span class="contact-icon">📍</span>
+            <div>
+              <span class="contact-label">Ubicación</span>
+              <span class="contact-value">Ecuador 🇪🇨</span>
+            </div>
+          </div>
+        </div>
+        <form class="contact-form" id="contactForm" novalidate>
+          {% csrf_token %}
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Nombre</label>
+              <input type="text" id="name" name="name" placeholder="Tu nombre" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" placeholder="tu@email.com" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject">Asunto</label>
+            <input type="text" id="subject" name="subject" placeholder="¿En qué te puedo ayudar?" required />
+          </div>
+          <div class="form-group">
+            <label for="message">Mensaje</label>
+            <textarea id="message" name="message" rows="5" placeholder="Cuéntame sobre tu proyecto..." required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">
+            <span>Enviar Mensaje</span>
+            <span class="send-icon">→</span>
+          </button>
+          <p class="form-note" id="formNote"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── FOOTER ───────────── -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-copy">
+        © 2025 <strong>{{ owner }}</strong> · Construido con 💙 en Django
+      </p>
+      <p class="footer-sub">Diseñado &amp; desarrollado con pasión desde Ecuador 🇪🇨</p>
+    </div>
+  </footer>
+
+  <script src="{% static 'portfolio/js/main.js' %}"></script>
+</body>
+</html>
