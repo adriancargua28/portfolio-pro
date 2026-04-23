@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}ChatLLM - Inicio{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="display-1 mb-3">💬</div>
+            <h1 class="display-4 fw-bold mb-3">ChatLLM</h1>
+            <p class="lead text-muted mb-5">Tu asistente de inteligencia artificial personal. Chatea con los mejores modelos de lenguaje gratuitos.</p>
+            <div class="d-flex gap-3 justify-content-center">
+                <a href="{% url 'chat:register' %}" class="btn btn-primary btn-lg px-5">
+                    <i class="bi bi-person-plus"></i> Comenzar gratis
+                </a>
+                <a href="{% url 'chat:login' %}" class="btn btn-outline-secondary btn-lg px-5">
+                    <i class="bi bi-box-arrow-in-right"></i> Iniciar sesión
+                </a>
+            </div>
+            <div class="row mt-5 g-4">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="fs-1 mb-3">🤖</div>
+                            <h5>Múltiples modelos</h5>
+                            <p class="text-muted small">Elige entre Llama, Mistral, Gemma, Phi-3 y más modelos gratuitos.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="fs-1 mb-3">💾</div>
+                            <h5>Historial completo</h5>
+                            <p class="text-muted small">Guarda, organiza y busca todas tus conversaciones fácilmente.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="fs-1 mb-3">⚡</div>
+                            <h5>Respuestas en streaming</h5>
+                            <p class="text-muted small">Visualiza las respuestas token a token en tiempo real.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

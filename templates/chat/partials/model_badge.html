@@ -1,0 +1,11 @@
+<form hx-post="{% url 'chat:conversation_change_model' conversation.pk %}"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      hx-target="#model-badge-container"
+      hx-swap="outerHTML">
+    <select name="model" class="form-select form-select-sm" style="max-width:200px"
+            onchange="this.form.dispatchEvent(new Event('submit', {bubbles: true}))">
+        {% for model_id, model_name in available_models %}
+        <option value="{{ model_id }}" {% if conversation.model == model_id %}selected{% endif %}>{{ model_name }}</option>
+        {% endfor %}
+    </select>
+</form>

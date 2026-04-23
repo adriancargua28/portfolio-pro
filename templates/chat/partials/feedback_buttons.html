@@ -1,0 +1,20 @@
+<div id="feedback-{{ msg.pk }}" class="d-flex gap-1 mt-1">
+    <button class="btn btn-sm {% if msg.feedback == 'like' %}btn-success{% else %}btn-outline-success{% endif %}"
+        hx-post="{% url 'chat:message_feedback' msg.pk %}"
+        hx-vals='{"feedback": "{% if msg.feedback == "like" %}{% else %}like{% endif %}"}'
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-target="#feedback-{{ msg.pk }}"
+        hx-swap="outerHTML"
+        title="Útil">
+        <i class="bi bi-hand-thumbs-up"></i>
+    </button>
+    <button class="btn btn-sm {% if msg.feedback == 'dislike' %}btn-danger{% else %}btn-outline-danger{% endif %}"
+        hx-post="{% url 'chat:message_feedback' msg.pk %}"
+        hx-vals='{"feedback": "{% if msg.feedback == "dislike" %}{% else %}dislike{% endif %}"}'
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-target="#feedback-{{ msg.pk }}"
+        hx-swap="outerHTML"
+        title="No útil">
+        <i class="bi bi-hand-thumbs-down"></i>
+    </button>
+</div>
