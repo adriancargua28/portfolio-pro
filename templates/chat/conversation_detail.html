@@ -1,19 +1,12 @@
 {% extends "base.html" %}
 {% block title %}{{ conversation.title }} - ChatLLM{% endblock %}
 
-{% block extra_head %}
-<style>
-.chat-container { height: calc(100vh - 280px); overflow-y: auto; padding: 1rem; }
-.model-selector select { max-width: 220px; }
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="container-fluid py-3">
     <div class="row">
         <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 d-none d-md-block">
-            <div class="card border-0 shadow-sm">
+        <div class="col-md-3 col-lg-2">
+            <div class="card border-0 shadow-sm mb-3">
                 <div class="card-body p-3">
                     <h6 class="text-muted mb-2">Conversaciones recientes</h6>
                     {% for c in request.user.conversations.all|slice:":10" %}
@@ -34,63 +27,64 @@
         <div class="col-md-9 col-lg-10">
             <!-- Header -->
             <div class="card border-0 shadow-sm mb-3">
-                <div class="card-body py-2 px-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <div class="d-flex align-items-center gap-2 flex-grow-1">
-                        <div id="conv-title-display">
-                            <span class="fw-bold fs-5" id="conv-title-text">{{ conversation.title }}</span>
-                            <button class="btn btn-sm btn-link p-0 ms-1" onclick="document.getElementById('rename-form').classList.toggle('d-none'); document.getElementById('conv-title-display').classList.toggle('d-none')">
-                                <i class="bi bi-pencil text-muted"></i>
-                            </button>
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                        <!-- Title & rename -->
+                        <div class="flex-grow-1">
+                            <details>
+                                <summary class="fw-bold fs-5" style="list-style:none">
+                                    {{ conversation.title }}
+                                    <span class="text-muted small ms-1"><i class="bi bi-pencil"></i> Renombrar</span>
+                                </summary>
+                                <form method="post" action="{% url 'chat:conversation_rename' conversation.pk %}" class="d-flex gap-1 mt-2">
+                                    {% csrf_token %}
+                                    <input type="text" name="title" class="form-control form-control-sm" value="{{ conversation.title }}" style="max-width:250px" required>
+                                    <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check"></i> Guardar</button>
+                                </form>
+                            </details>
                         </div>
-                        <form id="rename-form" class="d-none d-flex gap-1"
-                            hx-post="{% url 'chat:conversation_rename' conversation.pk %}"
-                            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                            hx-target="#conv-title-text"
-                            hx-swap="outerHTML"
-                            hx-on::after-request="document.getElementById('rename-form').classList.add('d-none'); document.getElementById('conv-title-display').classList.remove('d-none')">
-                            <input type="text" name="title" class="form-control form-control-sm" value="{{ conversation.title }}" style="max-width:200px">
-                            <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check"></i></button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('rename-form').classList.add('d-none'); document.getElementById('conv-title-display').classList.remove('d-none')"><i class="bi bi-x"></i></button>
-                        </form>
-                    </div>
-                    <div class="d-flex gap-2 align-items-center flex-wrap">
                         <!-- Model selector -->
-                        <div id="model-badge-container">
-                            {% include "chat/partials/model_badge.html" %}
+                        <form method="post" action="{% url 'chat:conversation_change_model' conversation.pk %}" class="d-flex gap-1 align-items-center">
+                            {% csrf_token %}
+                            <select name="model" class="form-select form-select-sm" style="max-width:200px">
+                                {% for model_id, model_name in available_models %}
+                                <option value="{{ model_id }}" {% if conversation.model == model_id %}selected{% endif %}>{{ model_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Cambiar</button>
+                        </form>
+                        <!-- Export & back -->
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'chat:export_conversation' conversation.pk %}?format=md" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-markdown"></i> MD
+                            </a>
+                            <a href="{% url 'chat:export_conversation' conversation.pk %}?format=json" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-filetype-json"></i> JSON
+                            </a>
+                            <a href="{% url 'chat:conversation_list' %}" class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i>
+                            </a>
                         </div>
-                        <!-- Export -->
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                <i class="bi bi-download"></i> Exportar
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'chat:export_conversation' conversation.pk %}?format=md"><i class="bi bi-markdown"></i> Markdown</a></li>
-                                <li><a class="dropdown-item" href="{% url 'chat:export_conversation' conversation.pk %}?format=json"><i class="bi bi-filetype-json"></i> JSON</a></li>
-                            </ul>
-                        </div>
-                        <a href="{% url 'chat:conversation_list' %}" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i>
-                        </a>
                     </div>
                 </div>
             </div>
 
             <!-- Messages -->
             <div class="card border-0 shadow-sm mb-3">
-                <div class="chat-container" id="chat-messages">
+                <div class="chat-container p-3" id="chat-messages">
                     {% for msg in messages_list %}
                     {% if msg.role == 'user' %}
                     <div class="d-flex justify-content-end mb-3">
-                        <div class="message-user p-3 max-w-75" style="max-width:75%">
-                            <p class="mb-0" style="white-space:pre-wrap">{{ msg.content }}</p>
+                        <div class="message-user p-3" style="max-width:75%">
+                            <p class="mb-0 msg-content">{{ msg.content }}</p>
                             <small class="opacity-75 d-block mt-1">{{ msg.created_at|date:"H:i" }}</small>
                         </div>
                     </div>
                     {% else %}
-                    <div class="d-flex justify-content-start mb-3" id="msg-{{ msg.pk }}">
+                    <div class="d-flex justify-content-start mb-3">
                         <div style="max-width:80%">
                             <div class="message-assistant p-3">
-                                <p class="mb-0 stream-content">{{ msg.content }}</p>
+                                <p class="mb-0 msg-content">{{ msg.content }}</p>
                                 <small class="text-muted d-block mt-1">
                                     {{ msg.created_at|date:"H:i" }}
                                     {% if msg.tokens_used %} · {{ msg.tokens_used }} tokens{% endif %}
@@ -107,123 +101,33 @@
                         <p>¡Empieza la conversación!</p>
                     </div>
                     {% endfor %}
-
-                    <!-- Streaming area -->
-                    <div id="stream-area" class="d-none">
-                        <div class="d-flex justify-content-end mb-3" id="streaming-user-msg">
-                            <div class="message-user p-3" style="max-width:75%">
-                                <p class="mb-0" id="streaming-user-text"></p>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-start mb-3">
-                            <div class="message-assistant p-3" style="max-width:80%" id="stream-content-box">
-                                <div class="typing-indicator"><span></span><span></span><span></span></div>
-                                <p class="mb-0 stream-content" id="stream-text"></p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
             <!-- Input form -->
             <div class="card border-0 shadow-sm">
                 <div class="card-body p-3">
-                    <form id="chat-form" onsubmit="sendStreamMessage(event)">
+                    <form method="post" action="{% url 'chat:send_message' conversation.pk %}">
                         {% csrf_token %}
-                        <!-- Context collapse -->
-                        <div class="mb-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#context-panel">
-                                <i class="bi bi-paperclip"></i> Añadir contexto
-                            </button>
-                        </div>
-                        <div class="collapse mb-2" id="context-panel">
-                            <textarea id="context-input" class="form-control mb-2" rows="2" placeholder="Fragmento de texto adicional (máx. 2000 caracteres)" maxlength="2000"></textarea>
-                        </div>
+                        <details class="mb-2">
+                            <summary class="btn btn-sm btn-outline-secondary">
+                                <i class="bi bi-paperclip"></i> Añadir contexto (opcional)
+                            </summary>
+                            <textarea name="context_text" class="form-control mt-2" rows="2"
+                                placeholder="Fragmento de texto adicional (máx. 2000 caracteres)"
+                                maxlength="2000"></textarea>
+                        </details>
                         <div class="input-group">
-                            <textarea id="message-input" class="form-control" rows="2" placeholder="Escribe tu mensaje... (Enter para enviar, Shift+Enter para nueva línea)" required></textarea>
-                            <button type="submit" class="btn btn-primary" id="send-btn">
-                                <i class="bi bi-send-fill"></i>
+                            <textarea name="content" class="form-control" rows="2"
+                                placeholder="Escribe tu mensaje..." required></textarea>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send-fill"></i> Enviar
                             </button>
                         </div>
-                        <small class="text-muted">Shift+Enter para nueva línea</small>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-const STREAM_URL = "{% url 'chat:stream_message' conversation.pk %}";
-const CSRF_TOKEN = "{{ csrf_token }}";
-
-function scrollToBottom() {
-    const container = document.getElementById('chat-messages');
-    container.scrollTop = container.scrollHeight;
-}
-
-scrollToBottom();
-
-// Enter to send
-document.getElementById('message-input').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        document.getElementById('chat-form').dispatchEvent(new Event('submit'));
-    }
-});
-
-function sendStreamMessage(event) {
-    event.preventDefault();
-    const content = document.getElementById('message-input').value.trim();
-    const contextText = document.getElementById('context-input') ? document.getElementById('context-input').value.trim() : '';
-
-    if (!content) return;
-
-    // Show user message immediately
-    const streamArea = document.getElementById('stream-area');
-    document.getElementById('streaming-user-text').textContent = content;
-    streamArea.classList.remove('d-none');
-    document.getElementById('stream-text').textContent = '';
-    document.getElementById('send-btn').disabled = true;
-    document.getElementById('message-input').value = '';
-
-    scrollToBottom();
-
-    // Build URL
-    const url = STREAM_URL + '?content=' + encodeURIComponent(content) + '&context_text=' + encodeURIComponent(contextText);
-
-    let fullText = '';
-    const evtSource = new EventSource(url);
-
-    evtSource.onmessage = function(e) {
-        if (e.data === '[DONE]') {
-            evtSource.close();
-            document.getElementById('send-btn').disabled = false;
-            // Reload to show saved messages with feedback buttons
-            location.reload();
-            return;
-        }
-        try {
-            const data = JSON.parse(e.data);
-            if (data.token) {
-                fullText += data.token;
-                document.getElementById('stream-text').textContent = fullText;
-                scrollToBottom();
-            }
-            if (data.error) {
-                document.getElementById('stream-text').textContent = 'Error: ' + data.error;
-                evtSource.close();
-                document.getElementById('send-btn').disabled = false;
-            }
-        } catch(err) {}
-    };
-
-    evtSource.onerror = function() {
-        evtSource.close();
-        document.getElementById('send-btn').disabled = false;
-    };
-}
-</script>
 {% endblock %}

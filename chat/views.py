@@ -3,16 +3,14 @@ import time
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST, require_http_methods
-from django.http import JsonResponse, StreamingHttpResponse, HttpResponse
+from django.views.decorators.http import require_POST
+from django.http import HttpResponse
 from django.contrib import messages
-from django.db.models import Q, Count
-from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 
 from .models import Conversation, Message, AVAILABLE_MODELS
 from .forms import RegisterForm, LoginForm, ConversationForm, MessageForm, SearchForm
-from .llm import get_llm_response, get_llm_stream
+from .llm import get_llm_response
 
 
 def index(request):
@@ -156,65 +154,7 @@ def send_message(request, pk):
     # Update conversation timestamp
     conv.save()
 
-    # Return HTMX partial
-    return render(request, "chat/partials/message_pair.html", {
-        "user_content": content,
-        "assistant_msg": assistant_msg,
-    })
-
-
-@login_required
-def stream_message(request, pk):
-    """SSE streaming endpoint."""
-    conv = get_object_or_404(Conversation, pk=pk, user=request.user)
-    content = request.GET.get("content", "").strip()
-    context_text = request.GET.get("context_text", "").strip()
-
-    if not content:
-        return HttpResponse("Mensaje vacío", status=400)
-
-    user_content = content
-    if context_text:
-        user_content = f"[Contexto adicional]\n{context_text}\n\n[Pregunta]\n{content}"
-
-    # Save user message
-    Message.objects.create(conversation=conv, role=Message.ROLE_USER, content=content)
-
-    # Build messages for API
-    api_messages = conv.get_messages_for_api()
-    if context_text:
-        api_messages[-1]["content"] = user_content
-
-    full_content = []
-    start_time = time.time()
-
-    def event_stream():
-        for chunk in get_llm_stream(api_messages, model=conv.model):
-            yield chunk
-            if '"token":' in chunk:
-                try:
-                    data = json.loads(chunk.replace("data: ", "").strip())
-                    if "token" in data:
-                        full_content.append(data["token"])
-                except Exception:
-                    pass
-
-        # Save assistant message after streaming completes
-        elapsed = int((time.time() - start_time) * 1000)
-        final_content = "".join(full_content)
-        msg = Message.objects.create(
-            conversation=conv,
-            role=Message.ROLE_ASSISTANT,
-            content=final_content if final_content else "[Sin respuesta]",
-            response_time_ms=elapsed,
-        )
-        conv.save()
-        yield f"data: {json.dumps({'message_id': msg.pk})}\n\n"
-
-    response = StreamingHttpResponse(event_stream(), content_type="text/event-stream")
-    response["Cache-Control"] = "no-cache"
-    response["X-Accel-Buffering"] = "no"
-    return response
+    return redirect("chat:conversation_detail", pk=pk)
 
 
 @login_required
@@ -225,8 +165,6 @@ def conversation_rename(request, pk):
     if new_title:
         conv.title = new_title[:200]
         conv.save()
-    if request.headers.get("HX-Request"):
-        return render(request, "chat/partials/conversation_title.html", {"conversation": conv})
     return redirect("chat:conversation_detail", pk=pk)
 
 
@@ -236,8 +174,6 @@ def conversation_archive(request, pk):
     conv = get_object_or_404(Conversation, pk=pk, user=request.user)
     conv.is_archived = not conv.is_archived
     conv.save()
-    if request.headers.get("HX-Request"):
-        return HttpResponse(status=200)
     return redirect("chat:conversation_list")
 
 
@@ -247,8 +183,6 @@ def conversation_pin(request, pk):
     conv = get_object_or_404(Conversation, pk=pk, user=request.user)
     conv.is_pinned = not conv.is_pinned
     conv.save()
-    if request.headers.get("HX-Request"):
-        return HttpResponse(status=200)
     return redirect("chat:conversation_list")
 
 
@@ -257,8 +191,6 @@ def conversation_pin(request, pk):
 def conversation_delete(request, pk):
     conv = get_object_or_404(Conversation, pk=pk, user=request.user)
     conv.delete()
-    if request.headers.get("HX-Request"):
-        return HttpResponse(status=200)
     return redirect("chat:conversation_list")
 
 
@@ -271,8 +203,6 @@ def conversation_change_model(request, pk):
     if model in valid_models:
         conv.model = model
         conv.save()
-    if request.headers.get("HX-Request"):
-        return render(request, "chat/partials/model_badge.html", {"conversation": conv, "available_models": AVAILABLE_MODELS})
     return redirect("chat:conversation_detail", pk=pk)
 
 
@@ -284,8 +214,6 @@ def message_feedback(request, msg_pk):
     if feedback in ("like", "dislike", ""):
         msg.feedback = feedback
         msg.save()
-    if request.headers.get("HX-Request"):
-        return render(request, "chat/partials/feedback_buttons.html", {"msg": msg})
     return redirect("chat:conversation_detail", pk=msg.conversation.pk)
 
 
