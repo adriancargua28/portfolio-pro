@@ -8,26 +8,21 @@
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body p-4">
                     <h4>¿Qué es ChatLLM?</h4>
-                    <p>ChatLLM es una aplicación web de chat inteligente construida con Django y HTMX que permite interactuar con múltiples modelos de lenguaje de gran escala (LLM) de forma gratuita a través de la API de NVIDIA Build.</p>
+                    <p>ChatLLM es una aplicación web de chat inteligente construida con Django que permite interactuar con múltiples modelos de lenguaje de gran escala (LLM) de forma gratuita a través de la API de NVIDIA Build.</p>
                     <h4 class="mt-4">Funcionalidades</h4>
                     <ul>
                         <li><strong>Autenticación:</strong> Registro e inicio de sesión de usuarios.</li>
                         <li><strong>Gestión de conversaciones:</strong> Crear, renombrar, archivar, fijar y eliminar conversaciones.</li>
                         <li><strong>Búsqueda:</strong> Buscar conversaciones por título o contenido de mensajes.</li>
-                        <li><strong>Streaming en tiempo real:</strong> Las respuestas del modelo se muestran token a token usando SSE/HTMX.</li>
                         <li><strong>Selector de modelo:</strong> Cada conversación puede usar un modelo diferente.</li>
-                        <li><strong>Contexto adicional:</strong> Añade fragmentos de texto como contexto al prompt.</li>
                         <li><strong>Valoración de respuestas:</strong> Marca respuestas como útiles o no útiles.</li>
-                        <li><strong>Exportación:</strong> Exporta conversaciones en formato Markdown o JSON.</li>
                         <li><strong>Panel de métricas:</strong> Estadísticas de uso para administradores.</li>
                     </ul>
                     <h4 class="mt-4">Tecnologías</h4>
                     <ul>
-                        <li>Django 6.0 + SQLite</li>
-                        <li>HTMX 1.9 para interacción dinámica</li>
+                        <li>Python + Django 6.0 + SQLite</li>
                         <li>Bootstrap 5.3</li>
                         <li>NVIDIA Build API (modelos gratuitos)</li>
-                        <li>Server-Sent Events (SSE) para streaming</li>
                     </ul>
                 </div>
             </div>

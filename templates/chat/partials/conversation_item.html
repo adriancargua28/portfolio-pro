@@ -21,12 +21,8 @@
                 <i class="bi bi-archive"></i>
             </button>
         </form>
-        <form method="post" action="{% url 'chat:conversation_delete' conv.pk %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar"
-                onclick="return confirm('¿Eliminar esta conversación?')">
-                <i class="bi bi-trash"></i>
-            </button>
-        </form>
+        <a href="{% url 'chat:conversation_delete_confirm' conv.pk %}" class="btn btn-sm btn-outline-danger" title="Eliminar">
+            <i class="bi bi-trash"></i>
+        </a>
     </div>
 </div>

@@ -40,19 +40,8 @@ class MessageForm(forms.Form):
             "class": "form-control",
             "rows": 3,
             "placeholder": "Escribe tu mensaje...",
-            "id": "message-input",
         }),
         label="",
-    )
-    context_text = forms.CharField(
-        widget=forms.Textarea(attrs={
-            "class": "form-control",
-            "rows": 2,
-            "placeholder": "Fragmento de contexto adicional (opcional, máx. 2000 caracteres)",
-        }),
-        required=False,
-        label="Contexto adicional",
-        max_length=2000,
     )
 
 

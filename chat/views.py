@@ -120,30 +120,19 @@ def send_message(request, pk):
         return HttpResponse("Error en el formulario", status=400)
 
     content = form.cleaned_data["content"].strip()
-    context_text = form.cleaned_data.get("context_text", "").strip()
 
     if not content:
         return HttpResponse("Mensaje vacío", status=400)
 
-    # Build user message content with optional context
-    user_content = content
-    if context_text:
-        user_content = f"[Contexto adicional]\n{context_text}\n\n[Pregunta]\n{content}"
-
     # Save user message
     Message.objects.create(conversation=conv, role=Message.ROLE_USER, content=content)
 
-    # Build messages for API
+    # Build messages for API and call LLM
     api_messages = conv.get_messages_for_api()
-    if context_text:
-        # Replace last user message with enriched version
-        api_messages[-1]["content"] = user_content
-
-    # Call LLM
     result = get_llm_response(api_messages, model=conv.model)
 
     # Save assistant message
-    assistant_msg = Message.objects.create(
+    Message.objects.create(
         conversation=conv,
         role=Message.ROLE_ASSISTANT,
         content=result["content"],
@@ -151,7 +140,6 @@ def send_message(request, pk):
         response_time_ms=result.get("response_time_ms", 0),
     )
 
-    # Update conversation timestamp
     conv.save()
 
     return redirect("chat:conversation_detail", pk=pk)
@@ -192,6 +180,12 @@ def conversation_delete(request, pk):
     conv = get_object_or_404(Conversation, pk=pk, user=request.user)
     conv.delete()
     return redirect("chat:conversation_list")
+
+
+@login_required
+def conversation_delete_confirm(request, pk):
+    conv = get_object_or_404(Conversation, pk=pk, user=request.user)
+    return render(request, "chat/conversation_delete_confirm.html", {"conversation": conv})
 
 
 @login_required
