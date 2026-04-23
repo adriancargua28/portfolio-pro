@@ -1,0 +1,32 @@
+<div class="list-group-item list-group-item-action conversation-item d-flex justify-content-between align-items-center py-3">
+    <a href="{% url 'chat:conversation_detail' conv.pk %}" class="text-decoration-none text-dark flex-grow-1">
+        <div class="d-flex align-items-center gap-2">
+            {% if conv.is_pinned %}<i class="bi bi-pin-fill text-warning"></i>{% endif %}
+            <span class="fw-semibold">{{ conv.title }}</span>
+        </div>
+        <small class="text-muted">{{ conv.updated_at|date:"d/m/Y H:i" }} · {{ conv.messages.count }} mensajes · <span class="badge bg-secondary">{{ conv.model|truncatechars:25 }}</span></small>
+    </a>
+    <div class="d-flex gap-1 ms-2">
+        <form method="post" action="{% url 'chat:conversation_pin' conv.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm {% if conv.is_pinned %}btn-warning{% else %}btn-outline-warning{% endif %}"
+                title="{% if conv.is_pinned %}Desfijar{% else %}Fijar{% endif %}">
+                <i class="bi bi-pin{% if conv.is_pinned %}-fill{% endif %}"></i>
+            </button>
+        </form>
+        <form method="post" action="{% url 'chat:conversation_archive' conv.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-secondary"
+                title="{% if conv.is_archived %}Desarchivar{% else %}Archivar{% endif %}">
+                <i class="bi bi-archive"></i>
+            </button>
+        </form>
+        <form method="post" action="{% url 'chat:conversation_delete' conv.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar"
+                onclick="return confirm('¿Eliminar esta conversación?')">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+    </div>
+</div>

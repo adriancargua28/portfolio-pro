@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Métricas - ChatLLM{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="bi bi-bar-chart text-primary"></i> Panel de Métricas</h2>
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="fs-1 text-primary fw-bold">{{ total_conversations }}</div>
+                <div class="text-muted">Conversaciones</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="fs-1 text-success fw-bold">{{ total_messages }}</div>
+                <div class="text-muted">Mensajes totales</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="fs-1 text-info fw-bold">{{ total_users }}</div>
+                <div class="text-muted">Usuarios</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm text-center p-3">
+                <div class="fs-1 fw-bold" style="color:#28a745">{{ likes }} 👍 / <span style="color:#dc3545">{{ dislikes }} 👎</span></div>
+                <div class="text-muted">Feedback</div>
+            </div>
+        </div>
+    </div>
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <h5>Uso por modelo</h5>
+            <table class="table">
+                <thead><tr><th>Modelo</th><th>Conversaciones</th></tr></thead>
+                <tbody>
+                    {% for model_name, count in model_usage.items %}
+                    <tr><td>{{ model_name }}</td><td>{{ count }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
