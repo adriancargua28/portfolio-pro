@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Nueva conversación - ChatLLM{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-body p-5">
+                    <h2 class="mb-4"><i class="bi bi-plus-circle text-primary"></i> Nueva conversación</h2>
+                    <form method="post">
+                        {% csrf_token %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.help_text %}<small class="text-muted">{{ field.help_text }}</small>{% endif %}
+                        </div>
+                        {% endfor %}
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary flex-grow-1">Crear</button>
+                            <a href="{% url 'chat:conversation_list' %}" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

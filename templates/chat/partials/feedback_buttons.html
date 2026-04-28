@@ -1,0 +1,16 @@
+<div class="d-flex gap-1 mt-1">
+    <form method="post" action="{% url 'chat:message_feedback' msg.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="feedback" value="{% if msg.feedback == 'like' %}{% else %}like{% endif %}">
+        <button type="submit" class="btn btn-sm {% if msg.feedback == 'like' %}btn-success{% else %}btn-outline-success{% endif %}" title="Útil">
+            <i class="bi bi-hand-thumbs-up"></i>
+        </button>
+    </form>
+    <form method="post" action="{% url 'chat:message_feedback' msg.pk %}">
+        {% csrf_token %}
+        <input type="hidden" name="feedback" value="{% if msg.feedback == 'dislike' %}{% else %}dislike{% endif %}">
+        <button type="submit" class="btn btn-sm {% if msg.feedback == 'dislike' %}btn-danger{% else %}btn-outline-danger{% endif %}" title="No útil">
+            <i class="bi bi-hand-thumbs-down"></i>
+        </button>
+    </form>
+</div>

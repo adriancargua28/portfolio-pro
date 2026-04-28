@@ -1,0 +1,17 @@
+<div class="d-flex justify-content-end mb-3">
+    <div class="message-user p-3" style="max-width:75%">
+        <p class="mb-0" style="white-space:pre-wrap">{{ user_content }}</p>
+    </div>
+</div>
+<div class="d-flex justify-content-start mb-3" id="msg-{{ assistant_msg.pk }}">
+    <div style="max-width:80%">
+        <div class="message-assistant p-3">
+            <p class="mb-0 stream-content">{{ assistant_msg.content }}</p>
+            <small class="text-muted d-block mt-1">
+                {% if assistant_msg.tokens_used %}{{ assistant_msg.tokens_used }} tokens · {% endif %}
+                {{ assistant_msg.response_time_ms }}ms
+            </small>
+        </div>
+        {% include "chat/partials/feedback_buttons.html" with msg=assistant_msg %}
+    </div>
+</div>
